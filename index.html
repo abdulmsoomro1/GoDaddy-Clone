@@ -1,0 +1,338 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoDaddy Clone - Domain Names, Websites, Hosting</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+        <div class="container">
+            <ul class="nav-left">
+                <li><a href="#" id="phoneHelp"><i class="fas fa-phone-alt"></i> 1-800-GODADDY</a></li>
+                <li><a href="#" id="helpBtn"><i class="fas fa-question-circle"></i> Help</a></li>
+                <li><a href="#" id="signInBtn"><i class="fas fa-user"></i> Sign In</a></li>
+                <li><a href="#" id="cartBtn"><i class="fas fa-shopping-cart"></i> Cart (<span id="cartCount">0</span>)</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Navigation -->
+    <nav class="main-nav">
+        <div class="container">
+            <div class="logo">GoDaddy Clone</div>
+            <ul class="nav-links">
+                <li><a href="#" class="nav-domain-btn">Domains</a></li>
+                <li><a href="#" class="nav-hosting-btn">Hosting</a></li>
+                <li><a href="#" class="nav-security-btn">Security</a></li>
+                <li><a href="#" class="nav-email-btn">Email & Marketing</a></li>
+                <li><a href="#" class="nav-pros-btn">For Pros</a></li>
+                <li><a href="#" id="settingsBtn"><i class="fas fa-cog"></i> Settings</a></li>
+            </ul>
+            <div class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>Bring your business online with a .com</h1>
+            <p>As low as $0.01 first year with annual plan. Other discounts available</p>
+            <div class="domain-search">
+                <input type="text" placeholder="Find your perfect domain" id="domainInput">
+                <button class="search-btn" id="searchBtn">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </div>
+            <div class="popular-domains">
+                <span>Popular:</span>
+                <a href="#" class="popular-domain" data-domain=".com">.com $0.01</a>
+                <a href="#" class="popular-domain" data-domain=".net">.net $4.99</a>
+                <a href="#" class="popular-domain" data-domain=".org">.org $2.99</a>
+                <a href="#" class="popular-domain" data-domain=".io">.io $39.99</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section class="products">
+        <div class="container">
+            <h2>More tools to grow your business.</h2>
+            <p>We're known for domains, but check out other essentials to take your business further online.</p>
+            <div class="product-grid">
+                <div class="product-card">
+                    <img src="https://img.icons8.com/color/96/000000/server.png" alt="Web Hosting">
+                    <h3>Web Hosting</h3>
+                    <p>Starting at $5.99/month</p>
+                    <button class="product-btn" data-product="web_hosting">Learn More</button>
+                </div>
+                <div class="product-card">
+                    <img src="https://img.icons8.com/color/96/000000/email.png" alt="Professional Email">
+                    <h3>Professional Email</h3>
+                    <p>Starting at $1.99/month</p>
+                    <button class="product-btn" data-product="professional_email">Learn More</button>
+                </div>
+                <div class="product-card">
+                    <img src="https://img.icons8.com/color/96/000000/ssl-lock.png" alt="SSL Security">
+                    <h3>SSL Security</h3>
+                    <p>Starting at $47.99/year</p>
+                    <button class="product-btn" data-product="ssl_security">Learn More</button>
+                </div>
+                <div class="product-card">
+                    <img src="https://img.icons8.com/color/96/000000/wordpress.png" alt="WordPress Hosting">
+                    <h3>WordPress Hosting</h3>
+                    <p>Starting at $6.99/month</p>
+                    <button class="product-btn" data-product="wordpress_hosting">Learn More</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <div class="feature">
+                <i class="fas fa-globe"></i>
+                <h3>20+ million customers</h3>
+                <p>Trusted by entrepreneurs worldwide</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-headset"></i>
+                <h3>24/7 support</h3>
+                <p>Dedicated support whenever you need it</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-lock"></i>
+                <h3>99.9% uptime</h3>
+                <p>Reliable service you can count on</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials">
+        <div class="container">
+            <h2>What our customers say</h2>
+            <div class="testimonial-slider">
+                <div class="testimonial active">
+                    <p>"GoDaddy made it so easy to get my business online. I had my domain and website up in no time!"</p>
+                    <div class="author">- Sarah J., Small Business Owner</div>
+                </div>
+                <div class="testimonial">
+                    <p>"Their customer support is amazing. They walked me through every step of setting up my online store."</p>
+                    <div class="author">- Michael T., E-commerce Entrepreneur</div>
+                </div>
+                <div class="testimonial">
+                    <p>"I've been using GoDaddy for years for all my domains and hosting needs. Highly recommended!"</p>
+                    <div class="author">- David L., Freelance Developer</div>
+                </div>
+            </div>
+            <div class="slider-controls">
+                <span class="dot active"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <div class="footer-section">
+                    <h4>Domains</h4>
+                    <ul>
+                        <li><a href="#" class="footer-domain-link">Domain Name Search</a></li>
+                        <li><a href="#" class="footer-transfer-link">Transfer Domains</a></li>
+                        <li><a href="#" class="footer-auction-link">Domain Auctions</a></li>
+                        <li><a href="#" class="footer-whois-link">WHOIS Lookup</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Hosting</h4>
+                    <ul>
+                        <li><a href="#" class="footer-webhosting-link">Web Hosting</a></li>
+                        <li><a href="#" class="footer-wordpress-link">WordPress Hosting</a></li>
+                        <li><a href="#" class="footer-vps-link">VPS Hosting</a></li>
+                        <li><a href="#" class="footer-dedicated-link">Dedicated Servers</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Security</h4>
+                    <ul>
+                        <li><a href="#" class="footer-ssl-link">SSL Certificates</a></li>
+                        <li><a href="#" class="footer-backup-link">Site Backup</a></li>
+                        <li><a href="#" class="footer-security-link">Website Security</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="#" class="footer-help-link">Help Center</a></li>
+                        <li><a href="#" class="footer-support-link">Product Support</a></li>
+                        <li><a href="#" class="footer-community-link">Community</a></li>
+                        <li><a href="#" class="footer-contact-link">Contact Us</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="social-links">
+                    <a href="#" class="social-fb"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-youtube"><i class="fab fa-youtube"></i></a>
+                </div>
+                <div class="copyright">
+                    <p>© 2023 GoDaddy Clone. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Search Results Modal -->
+    <div class="modal" id="searchModal">
+        <div class="modal-content">
+            <span class="close-modal">×</span>
+            <h2>Domain Search Results</h2>
+            <div class="search-results" id="searchResults">
+                <!-- Results will be inserted here by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Menu -->
+    <div class="settings-menu" id="settingsMenu">
+        <span class="close-settings">×</span>
+        <h2>Settings</h2>
+        <div class="settings-option">
+            <h3>Theme</h3>
+            <select id="themeSelect">
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+                <option value="system">System Default</option>
+            </select>
+        </div>
+        <div class="settings-option">
+            <h3>Language</h3>
+            <select id="languageSelect">
+                <option value="en">English</option>
+                <option value="es">Spanish</option>
+                <option value="fr">French</option>
+                <option value="de">German</option>
+            </select>
+        </div>
+        <div class="settings-option">
+            <h3>Notifications</h3>
+            <input type="checkbox" id="emailNotifications" checked>
+            <label for="emailNotifications">Email Notifications</label><br>
+            <input type="checkbox" id="browserNotifications" checked>
+            <label for="browserNotifications">Browser Notifications</label>
+        </div>
+    </div>
+
+    <!-- Cart Sidebar -->
+    <div class="cart-sidebar" id="cartSidebar">
+        <span class="close-cart">×</span>
+        <h2>Your Cart</h2>
+        <div class="cart-items" id="cartItems">
+            <!-- Cart items will be inserted here -->
+            <p class="empty-cart-message">Your cart is empty</p>
+        </div>
+        <div class="cart-total" id="cartTotal" style="display: none;">
+            Total: $<span id="totalAmount">0.00</span>
+        </div>
+        <button class="checkout-btn" id="checkoutBtn" style="display: none;">Proceed to Checkout</button>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="login-modal" id="loginModal">
+        <div class="login-content">
+            <span class="close-login">×</span>
+            <h2>Sign In</h2>
+            <form class="login-form">
+                <input type="text" placeholder="Username or Email" required>
+                <input type="password" placeholder="Password" required>
+                <button type="submit">Sign In</button>
+            </form>
+            <p style="margin-top: 15px; text-align: center;">
+                <a href="#" id="forgotPassword">Forgot password?</a> | 
+                <a href="#" id="createAccount">Create account</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div class="help-modal" id="helpModal">
+        <div class="help-content">
+            <span class="close-help">×</span>
+            <h2>Help Center</h2>
+            <div class="help-topic">
+                <h3>Domain Help</h3>
+                <p>Find answers to common questions about domain registration, transfer, and management.</p>
+                <a href="#" class="help-link">View Domain Help</a>
+            </div>
+            <div class="help-topic">
+                <h3>Hosting Help</h3>
+                <p>Get support for web hosting, WordPress hosting, and other hosting services.</p>
+                <a href="#" class="help-link">View Hosting Help</a>
+            </div>
+            <div class="help-topic">
+                <h3>Contact Support</h3>
+                <p>Can't find what you're looking for? Contact our support team 24/7.</p>
+                <a href="#" class="help-link">Contact Us</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Attribution Footer -->
+    <div class="attribution-footer">
+        <p>Cloned by AbdulRahim Soomro | For Educational Purposes Only | Created for Portfolio Showcase</p>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
